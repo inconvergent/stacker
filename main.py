@@ -7,32 +7,25 @@ def get_stack(path):
 
   from glob import glob
   from scipy.ndimage import imread
-  stack = []
 
-  files = glob(path+'*.png')
+  files = sorted(glob(path+'*.png'))
 
-  for f in sorted(files):
+  stack = imread(files[0])[:,:,0]/256.
+
+  for f in sorted(files[1:]):
     print(f)
     img = imread(f)/256.
-    stack.append(img[:,:,0])
+    stack += img[:,:,0]/256.
 
   return stack
 
 def do_stack(stack):
 
-  from numpy import dstack
-
-  d = dstack(stack)
-
-  s = d.sum(axis=2)
-  mv = s[:].max()
-
-  s[:,:] /= mv
-
+  mv = stack[:].max()
   print(mv)
-  print(d.shape)
+  stack[:,:] /= mv
 
-  return s
+  return stack
 
 def export(img, path):
 
@@ -49,10 +42,6 @@ def main(path):
   s = do_stack(stack)
 
   export(s, './')
-
-
-
-
 
 
 if __name__ == '__main__' :
